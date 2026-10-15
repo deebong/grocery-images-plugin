@@ -1,0 +1,241 @@
+[
+  {
+    "barcode": "8901030383700",
+    "product_name": "Tata Salt Vacuum Evaporated Iodised Salt",
+    "brand": "Tata",
+    "category": "Staples & Salt",
+    "variant": "Regular",
+    "net_quantity": "1",
+    "net_unit": "kg",
+    "mrp": 28.00,
+    "selling_price": 27.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/front_en.13.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/front_en.13.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: tactile-food",
+        "source_url": "https://world.openfoodfacts.org/product/8901030383700"
+      },
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/back_en.14.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/back_en.14.200.jpg",
+        "image_role": "back",
+        "is_primary": false,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: tactile-food",
+        "source_url": "https://world.openfoodfacts.org/product/8901030383700"
+      }
+    ]
+  },
+  {
+    "barcode": "8901491101837",
+    "product_name": "Aashirvaad Shudh Chakki Atta 100% Whole Wheat",
+    "brand": "Aashirvaad",
+    "category": "Atta & Flours",
+    "variant": "Chakki Atta",
+    "net_quantity": "5",
+    "net_unit": "kg",
+    "mrp": 245.00,
+    "selling_price": 230.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/149/110/1837/front_en.7.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/149/110/1837/front_en.7.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: org-database",
+        "source_url": "https://world.openfoodfacts.org/product/8901491101837"
+      }
+    ]
+  },
+  {
+    "barcode": "8901725181222",
+    "product_name": "Maggi 2-Minute Masala Instant Noodles",
+    "brand": "Nestle Maggi",
+    "category": "Noodles & Instant Food",
+    "variant": "Masala 4-Pack",
+    "net_quantity": "280",
+    "net_unit": "g",
+    "mrp": 56.00,
+    "selling_price": 54.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/172/518/1222/front_en.11.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/172/518/1222/front_en.11.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: openfoodfacts-contributors",
+        "source_url": "https://world.openfoodfacts.org/product/8901725181222"
+      }
+    ]
+  },
+  {
+    "barcode": "8901030022357",
+    "product_name": "Amul Butter Pasteurized Salted",
+    "brand": "Amul",
+    "category": "Dairy & Breakfast",
+    "variant": "Salted",
+    "net_quantity": "500",
+    "net_unit": "g",
+    "mrp": 275.00,
+    "selling_price": 270.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/103/002/2357/front_en.12.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/103/002/2357/front_en.12.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: kiliweb",
+        "source_url": "https://world.openfoodfacts.org/product/8901030022357"
+      }
+    ]
+  },
+  {
+    "barcode": "8901058852332",
+    "product_name": "Fortune Sunlite Refined Sunflower Oil Pouch",
+    "brand": "Fortune",
+    "category": "Edible Oils & Ghee",
+    "variant": "Refined Sunflower",
+    "net_quantity": "1",
+    "net_unit": "L",
+    "mrp": 145.00,
+    "selling_price": 139.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/105/885/2332/front_en.4.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/105/885/2332/front_en.4.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: openfoodfacts-india",
+        "source_url": "https://world.openfoodfacts.org/product/8901058852332"
+      }
+    ]
+  },
+  {
+    "barcode": "8901063012622",
+    "product_name": "Parle-G Original Gluco Biscuits",
+    "brand": "Parle",
+    "category": "Biscuits & Bakery",
+    "variant": "Gluco Family Pack",
+    "net_quantity": "800",
+    "net_unit": "g",
+    "mrp": 90.00,
+    "selling_price": 85.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/106/301/2622/front_en.10.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/106/301/2622/front_en.10.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: food-indexer",
+        "source_url": "https://world.openfoodfacts.org/product/8901063012622"
+      }
+    ]
+  },
+  {
+    "barcode": "8901248113028",
+    "product_name": "Tata Tea Gold Rich Taste & Aroma",
+    "brand": "Tata Tea",
+    "category": "Beverages & Tea",
+    "variant": "Gold Leaf Blend",
+    "net_quantity": "500",
+    "net_unit": "g",
+    "mrp": 310.00,
+    "selling_price": 295.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/124/811/3028/front_en.5.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/124/811/3028/front_en.5.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: tata-tea-contributor",
+        "source_url": "https://world.openfoodfacts.org/product/8901248113028"
+      }
+    ]
+  },
+  {
+    "barcode": "8901030825224",
+    "product_name": "Surf Excel Quick Wash Detergent Powder",
+    "brand": "Surf Excel",
+    "category": "Household & Laundry",
+    "variant": "Quick Wash",
+    "net_quantity": "1",
+    "net_unit": "kg",
+    "mrp": 140.00,
+    "selling_price": 135.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/103/082/5224/front_en.3.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/103/082/5224/front_en.3.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: unilever-contributor",
+        "source_url": "https://world.openfoodfacts.org/product/8901030825224"
+      }
+    ]
+  },
+  {
+    "barcode": "8901262010044",
+    "product_name": "Dettol Original Germ Protection Soap (Pack of 4)",
+    "brand": "Dettol",
+    "category": "Personal Care & Hygiene",
+    "variant": "Original Soap 125g x 4",
+    "net_quantity": "500",
+    "net_unit": "g",
+    "mrp": 210.00,
+    "selling_price": 198.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/126/201/0044/front_en.6.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/126/201/0044/front_en.6.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Open Food Facts contributor: rb-indexer",
+        "source_url": "https://world.openfoodfacts.org/product/8901262010044"
+      }
+    ]
+  },
+  {
+    "barcode": "0890103038370",
+    "product_name": "Tata Iodised Crystal Salt (Sample Leading Zero SKU)",
+    "brand": "Tata",
+    "category": "Staples & Salt",
+    "variant": "Crystal",
+    "net_quantity": "1",
+    "net_unit": "kg",
+    "mrp": 22.00,
+    "selling_price": 20.00,
+    "currency": "INR",
+    "images": [
+      {
+        "image_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/front_en.13.400.jpg",
+        "thumbnail_url": "https://images.openfoodfacts.org/images/products/890/103/038/3700/front_en.13.200.jpg",
+        "image_role": "front",
+        "is_primary": true,
+        "licence": "CC-BY-SA 4.0",
+        "attribution": "Sample synthetic leading-zero barcode test entry",
+        "source_url": "https://world.openfoodfacts.org"
+      }
+    ]
+  }
+]

@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "name": "Grocery Product Image Picker & Catalog Importer",
+  "providers": {
+    "local_indexeddb": {
+      "id": "local_indexeddb",
+      "name": "Local Catalog (IndexedDB)",
+      "enabled": true,
+      "priority": 1,
+      "capabilities": ["search", "barcode", "images", "import", "offline"]
+    },
+    "sample_catalog": {
+      "id": "sample_catalog",
+      "name": "Indian FMCG Sample Dataset",
+      "enabled": true,
+      "priority": 2,
+      "capabilities": ["search", "barcode", "images"]
+    },
+    "open_food_facts": {
+      "id": "open_food_facts",
+      "name": "Open Food Facts (India / Global)",
+      "enabled": true,
+      "priority": 3,
+      "capabilities": ["barcode", "search"],
+      "config": {
+        "country": "in",
+        "userAgent": "RetailPOSGroceryPicker/1.0 (retailpos@example.org)",
+        "rateLimitMs": 1000,
+        "timeoutMs": 6000
+      }
+    },
+    "csv_importer": {
+      "id": "csv_importer",
+      "name": "Custom CSV / JSON File Provider",
+      "enabled": true,
+      "priority": 4,
+      "capabilities": ["import", "images"]
+    },
+    "google_drive": {
+      "id": "google_drive",
+      "name": "Google Drive Image Index (Optional)",
+      "enabled": false,
+      "priority": 5,
+      "capabilities": ["search", "images"],
+      "config": {
+        "apiKey": "",
+        "folderId": "",
+        "useMockMode": true
+      }
+    },
+    "google_sheets": {
+      "id": "google_sheets",
+      "name": "Google Apps Script / Sheets (Optional)",
+      "enabled": false,
+      "priority": 6,
+      "capabilities": ["search", "barcode", "images", "sync"],
+      "config": {
+        "webAppUrl": "",
+        "useMockMode": true
+      }
+    }
+  }
+}

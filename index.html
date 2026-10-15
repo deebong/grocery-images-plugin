@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grocery Product Image Picker & Catalog Importer</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-gray-900 text-base leading-tight flex items-center gap-2">
+            Grocery Pack-shot Picker & Catalog Importer
+            <span class="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full uppercase tracking-wider">Open Source POS Plugin</span>
+          </h1>
+          <p class="text-xs text-gray-500">Indian FMCG quick-commerce images, barcodes, and metadata manager</p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics & Local Status -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-gray-600 font-medium">Local IndexedDB:</span>
+          <span id="localCatalogCountBadge" class="font-bold text-gray-900">10 items</span>
+        </div>
+        <button type="button" onclick="window.GroceryApp.openProductEditor()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add SKU
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-100 flex gap-6 overflow-x-auto text-sm">
+      <button data-tab-target="searchTab" class="py-2.5 px-1 border-b-2 font-medium border-emerald-600 text-emerald-700 flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        Product Catalog Search
+      </button>
+      <button data-tab-target="importTab" class="py-2.5 px-1 border-b-2 font-medium border-transparent text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Bulk Import (CSV / JSON)
+      </button>
+      <button data-tab-target="editorTab" class="py-2.5 px-1 border-b-2 font-medium border-transparent text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Product Editor
+      </button>
+      <button data-tab-target="posSimulationTab" class="py-2.5 px-1 border-b-2 font-medium border-transparent text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        Host POS Form Integration Demo
+      </button>
+      <button data-tab-target="providersTab" class="py-2.5 px-1 border-b-2 font-medium border-transparent text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Provider Registry & Licences
+      </button>
+      <a href="tests/index.html" class="py-2.5 px-1 border-b-2 font-medium border-transparent text-blue-600 hover:text-blue-800 flex items-center gap-1.5 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Run Test Suite &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- TAB 1: PRODUCT SEARCH & BROWSE -->
+    <section id="searchTab" class="tab-content space-y-6">
+      <!-- Search & Filter Controls -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <!-- Text Search (Debounced 350ms) -->
+          <div class="md:col-span-7 relative">
+            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Search Grocery Catalog</label>
+            <div class="relative">
+              <input id="catalogSearchInput" type="text" placeholder="Search by product name, brand (e.g. Tata, Maggi, Amul), category or pack size..." class="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-hidden">
+              <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-1">Queries IndexedDB first, then fetches Open Food Facts if query is &gt;= 3 chars.</p>
+          </div>
+
+          <!-- Barcode Scanner / Exact Lookup -->
+          <div class="md:col-span-5 relative">
+            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">USB Scanner / Exact Barcode</label>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <input id="barcodeSearchInput" type="text" placeholder="Scan or enter EAN/UPC..." class="w-full pl-9 pr-3 py-2.5 text-sm font-mono bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-hidden">
+                <svg class="w-5 h-5 text-gray-400 absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+              </div>
+              <button id="barcodeLookupBtn" type="button" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors whitespace-nowrap">
+                Lookup Barcode
+              </button>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-1">Accepts USB handheld barcode scanners directly (string safe with leading zeros).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Loading / Status Spinner -->
+      <div id="searchLoadingIndicator" class="hidden flex items-center justify-center py-6 text-emerald-700 space-x-2">
+        <svg class="animate-spin w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+        <span class="text-xs font-medium text-gray-600">Searching catalogs &amp; Open Food Facts...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptySearchState" class="hidden bg-white p-12 text-center rounded-2xl border border-gray-200 shadow-xs">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <h3 class="text-base font-bold text-gray-700">No matching grocery items found</h3>
+        <p class="text-xs text-gray-500 max-w-sm mx-auto mt-1">Try another brand or barcode, or import custom CSV items in the Bulk Import tab.</p>
+      </div>
+
+      <!-- Product Result Cards Grid (Indian Quick Commerce Layout) -->
+      <div id="productResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <!-- Dynamically populated by js/app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 2: BULK IMPORT SYSTEM -->
+    <section id="importTab" class="tab-content hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Bulk Catalog & Image Importer</h2>
+          <p class="text-xs text-gray-500 mt-1">Import your CSV or JSON datasets (such as Indian retail FMCG or Kaggle grocery exports). Supports RFC 4180 quotes, Indian text, and automated column detection.</p>
+        </div>
+
+        <!-- Upload Dropzone -->
+        <div class="border-2 border-dashed border-gray-300 hover:border-emerald-500 rounded-2xl p-8 text-center transition-colors bg-gray-50 hover:bg-emerald-50/20 cursor-pointer" onclick="document.getElementById('catalogFileInput').click()">
+          <input id="catalogFileInput" type="file" accept=".csv,.json" class="hidden">
+          <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <div class="text-sm font-semibold text-gray-700">Click to upload CSV or JSON catalog file</div>
+          <p class="text-xs text-gray-500 mt-1">Supports sample-products.csv, sample-products.json, and custom retailer exports</p>
+        </div>
+
+        <!-- Import Options & Safe Protection Rules -->
+        <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold text-emerald-900 uppercase tracking-wider">POS Safety &amp; Overwrite Rules</h4>
+            <div class="flex flex-wrap gap-4 pt-1">
+              <label class="flex items-center text-xs text-gray-700 cursor-pointer">
+                <input id="importPreservePricesCheck" type="checkbox" checked class="rounded text-emerald-600 focus:ring-emerald-500 mr-2">
+                Preserve retailer selling prices (do not overwrite existing store SP)
+              </label>
+              <label class="flex items-center text-xs text-gray-700 cursor-pointer">
+                <input id="importImageOnlyCheck" type="checkbox" class="rounded text-emerald-600 focus:ring-emerald-500 mr-2">
+                Image-only enrichment mode (only attach pack-shots)
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="rollbackImportBtn" type="button" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors">
+              Rollback Last Batch
+            </button>
+            <button id="exportImportErrorsBtn" type="button" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors">
+              Export Audit CSV
+            </button>
+            <button id="executeImportBtn" type="button" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors">
+              Commit Selected to DB
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div id="importProgressContainer" class="hidden space-y-2">
+          <div class="flex justify-between text-xs font-semibold text-gray-700">
+            <span id="importProgressLabel">Processing batch...</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div id="importProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-200" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Stats Metric Grid -->
+        <div id="importStatsSummary"></div>
+
+        <!-- Staged Import Preview Table -->
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">
+                <th class="p-2.5 text-center w-10">
+                  <input id="selectAllImportCheckbox" type="checkbox" checked>
+                </th>
+                <th class="p-2.5">Barcode</th>
+                <th class="p-2.5">Product Name</th>
+                <th class="p-2.5">Brand</th>
+                <th class="p-2.5">Price</th>
+                <th class="p-2.5">Images</th>
+              </tr>
+            </thead>
+            <tbody id="importPreviewTableBody">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-xs text-gray-400">Upload a CSV or JSON file to preview parsed records.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PRODUCT EDITOR -->
+    <section id="editorTab" class="tab-content hidden max-w-4xl mx-auto">
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-6">
+        <div class="border-b border-gray-100 pb-4 flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Grocery Product Editor</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Edit canonical fields without overwriting operational POS inventory or GST</p>
+          </div>
+          <button type="button" onclick="window.GroceryApp.switchTab('searchTab')" class="text-xs text-gray-500 hover:text-gray-800">
+            &larr; Back to catalog
+          </button>
+        </div>
+
+        <form id="productEditForm" onsubmit="window.GroceryApp.handleSaveEditedProduct(event)" class="space-y-4">
+          <input type="hidden" id="editProductId">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Barcode (EAN-13 / UPC)</label>
+              <input type="text" id="editBarcode" class="w-full px-3 py-2 font-mono text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Product Name *</label>
+              <input type="text" id="editProductName" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Brand</label>
+              <input type="text" id="editBrand" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Category</label>
+              <input type="text" id="editCategory" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Pack Size / Net Quantity</label>
+              <div class="flex gap-2">
+                <input type="text" id="editNetQuantity" placeholder="e.g. 500" class="w-2/3 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+                <select id="editNetUnit" class="w-1/3 px-2 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50">
+                  <option value="g">g</option>
+                  <option value="kg">kg</option>
+                  <option value="ml">ml</option>
+                  <option value="L">L</option>
+                  <option value="pcs">pcs</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Variant / Flavor</label>
+              <input type="text" id="editVariant" placeholder="e.g. Regular, Masala, Low Sodium" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">MRP (₹)</label>
+              <input type="number" step="0.01" id="editMrp" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Retail Selling Price (₹)</label>
+              <input type="number" step="0.01" id="editSellingPrice" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Primary Pack-shot Image URL</label>
+            <input type="url" id="editPrimaryImageUrl" placeholder="https://..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-emerald-500">
+          </div>
+
+          <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+            <button type="button" onclick="window.GroceryApp.switchTab('searchTab')" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">
+              Save to Catalog
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: HOST POS INTEGRATION SIMULATOR -->
+    <section id="posSimulationTab" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-5">
+        <div class="border-b border-gray-100 pb-3">
+          <h2 class="text-lg font-bold text-gray-900">Retail POS Product Form Simulator</h2>
+          <p class="text-xs text-gray-500">Demonstrates how an existing vanilla POS web form invokes the plugin, receives image and product metadata without clobbering tax/inventory settings.</p>
+        </div>
+
+        <form id="hostPosProductForm" class="space-y-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+          <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+            <span class="text-xs font-bold text-gray-700 uppercase">POS Inventory Record #POS-4891</span>
+            <button type="button" onclick="window.ProductCatalogPicker.open({ targetForm: '#hostPosProductForm' })" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              Auto-fill from Image Picker Plugin
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-1 flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-xl">
+              <img id="productImagePreview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5'><rect width='18' height='18' x='3' y='3' rx='2'/><path d='m21 15-5-5L5 21'/></svg>" alt="Pack-shot" class="h-32 object-contain mb-2">
+              <input type="hidden" name="image_url" id="pos_image_url">
+              <span class="text-[11px] text-gray-400">Pack-shot Preview</span>
+            </div>
+
+            <div class="md:col-span-2 grid grid-cols-2 gap-3">
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-gray-600 uppercase">Product Name</label>
+                <input type="text" name="product_name" id="pos_product_name" class="w-full px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase">Barcode / EAN</label>
+                <input type="text" name="barcode" id="pos_barcode" class="w-full px-2.5 py-1.5 font-mono text-xs bg-white border border-gray-300 rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase">Brand</label>
+                <input type="text" name="brand" id="pos_brand" class="w-full px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase">MRP (₹)</label>
+                <input type="number" step="0.01" name="mrp" id="pos_mrp" class="w-full px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 uppercase">Selling Price (₹)</label>
+                <input type="number" step="0.01" name="selling_price" id="pos_selling_price" class="w-full px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded">
+              </div>
+            </div>
+          </div>
+
+          <!-- POS Operational Protected Fields -->
+          <div class="pt-3 border-t border-gray-200">
+            <span class="text-[11px] font-bold text-gray-500 uppercase block mb-2">Host Protected Fields (Untouched by picker)</span>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] text-gray-500 uppercase">Current Inventory Stock</label>
+                <input type="number" value="125" readonly class="w-full px-2 py-1 text-xs bg-gray-100 border border-gray-200 rounded text-gray-600">
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-500 uppercase">GST Slab (%)</label>
+                <input type="text" value="5% GST" readonly class="w-full px-2 py-1 text-xs bg-gray-100 border border-gray-200 rounded text-gray-600">
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-500 uppercase">HSN Code</label>
+                <input type="text" value="HSN 11010000" readonly class="w-full px-2 py-1 text-xs bg-gray-100 border border-gray-200 rounded text-gray-600">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 5: PROVIDER REGISTRY & LICENCES -->
+    <section id="providersTab" class="tab-content hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Provider Registry & Licensing Layer</h2>
+          <p class="text-xs text-gray-500 mt-1">Configure active image and metadata providers and review database/asset licensing.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Provider 1: IndexedDB -->
+          <div class="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-gray-800">Local Catalog (IndexedDB)</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked data-provider-toggle="local_indexeddb" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500">Offline-first local store for your retailer catalogue.</p>
+            <div class="text-[11px] text-gray-400">Capabilities: search, barcode, images, import, offline</div>
+          </div>
+
+          <!-- Provider 2: Sample Indian FMCG -->
+          <div class="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-gray-800">Synthetic FMCG Dataset</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked data-provider-toggle="sample_catalog" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500">Built-in synthetic FMCG products (Tata, Amul, Maggi, Fortune, Parle-G).</p>
+            <div class="text-[11px] text-gray-400">Capabilities: search, barcode, images</div>
+          </div>
+
+          <!-- Provider 3: Open Food Facts -->
+          <div class="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-gray-800">Open Food Facts API</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked data-provider-toggle="open_food_facts" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500">Live barcode lookup & simple search. Governed by ODbL 1.0 (Database) and CC-BY-SA 4.0 (Photos).</p>
+            <div class="text-[11px] text-gray-400">Rate Limit: 1 request/sec max. User-Agent configured.</div>
+          </div>
+
+          <!-- Provider 4: Google Drive & Sheets -->
+          <div class="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-gray-800">Google Sheets / Drive (Optional)</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" data-provider-toggle="google_sheets" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500">Connect Google Apps Script Web App without embedding secret keys in client code.</p>
+            <div class="text-[11px] text-gray-400">Adapter file: Code.gs included</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: IMAGE PICKER & PACK-SHOT MANAGER -->
+  <div id="imagePickerModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+        <div>
+          <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block">Pack-shot Selector &amp; Licensing</span>
+          <h3 id="pickerProductTitle" class="text-base font-bold text-gray-900 truncate max-w-lg">Product Title</h3>
+        </div>
+        <button type="button" onclick="window.ImagePicker.closePicker()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Add Custom Pack-shot Bar -->
+      <div class="p-4 bg-gray-100/70 border-b border-gray-200 flex flex-wrap gap-2 items-center text-xs">
+        <span class="font-semibold text-gray-700">Add External Image:</span>
+        <input id="newImageUrlInput" type="url" placeholder="https://..." class="flex-1 min-w-[200px] px-3 py-1.5 bg-white border border-gray-300 rounded-lg">
+        <select id="newImageRoleSelect" class="px-2 py-1.5 bg-white border border-gray-300 rounded-lg">
+          <option value="front">Front Pack</option>
+          <option value="back">Back Pack</option>
+          <option value="ingredients">Ingredients</option>
+          <option value="packaging">Packaging</option>
+        </select>
+        <button type="button" onclick="window.ImagePicker.addCustomImageUrl(document.getElementById('newImageUrlInput').value, document.getElementById('newImageRoleSelect').value); document.getElementById('newImageUrlInput').value='';" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors">
+          Attach Image
+        </button>
+      </div>
+
+      <!-- Modal Gallery Grid -->
+      <div class="p-5 flex-1 overflow-y-auto">
+        <div id="pickerImageGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Dynamically populated by js/image-picker.js -->
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <span class="text-xs text-gray-500">Pick one primary pack-shot. You may retain secondary images for product details.</span>
+        <div class="flex gap-2">
+          <button type="button" onclick="window.ImagePicker.closePicker()" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-100">
+            Cancel
+          </button>
+          <button type="button" onclick="window.ImagePicker.saveChanges()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm">
+            Save Image Selection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plugin host modal container for POS adapter -->
+  <div id="posPluginContainer" class="hidden"></div>
+
+  <!-- Vanilla Scripts in Modular Architecture -->
+  <script src="js/catalog-core.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/licensing.js"></script>
+  <script src="js/providers/csv-provider.js"></script>
+  <script src="js/providers/open-food-facts.js"></script>
+  <script src="js/providers/google-drive.js"></script>
+  <script src="js/providers/google-sheets.js"></script>
+  <script src="js/catalog-search.js"></script>
+  <script src="js/image-picker.js"></script>
+  <script src="js/import-manager.js"></script>
+  <script src="js/pos-adapter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

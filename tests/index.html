@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grocery Product Picker - Browser Test Suite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 p-8">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+    <div class="flex items-center justify-between border-b pb-4">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900">Plugin Test Runner</h1>
+        <p class="text-xs text-gray-500">Unit &amp; Mocked Integration Tests for Schema, Search, Barcode, Licensing, CSV, and IndexedDB</p>
+      </div>
+      <div class="flex gap-2">
+        <a href="../index.html" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg">&larr; Return to App</a>
+        <button id="runTestsBtn" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm">Run All Tests</button>
+      </div>
+    </div>
+
+    <!-- Summary Box -->
+    <div id="testSummary" class="p-4 rounded-xl bg-gray-100 flex items-center justify-between text-sm font-semibold">
+      <span>Ready to execute tests...</span>
+      <span id="testCounter" class="text-xs font-mono bg-white px-2.5 py-1 rounded border">0 / 0</span>
+    </div>
+
+    <!-- Test Results List -->
+    <div id="testResults" class="space-y-2"></div>
+  </div>
+
+  <!-- Dependencies -->
+  <script src="../js/catalog-core.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/licensing.js"></script>
+  <script src="../js/providers/csv-provider.js"></script>
+  <script src="../js/providers/open-food-facts.js"></script>
+  <script src="../js/providers/google-drive.js"></script>
+  <script src="../js/providers/google-sheets.js"></script>
+  <script src="../js/catalog-search.js"></script>
+  <script src="../js/image-picker.js"></script>
+  <script src="../js/import-manager.js"></script>
+  <script src="../js/pos-adapter.js"></script>
+
+  <script>
+    const tests = [
+      {
+        name: 'Barcode Normalization Preserves Leading Zeros',
+        fn: () => {
+          const raw = '0890103038370';
+          const norm = window.CatalogCore.normalizeBarcode(raw);
+          if (norm !== '0890103038370') throw new Error(`Expected '0890103038370', got '${norm}'`);
+          if (typeof norm !== 'string') throw new Error('Normalized barcode is not a string');
+        }
+      },
+      {
+        name: 'Barcode Checksum Verification (EAN-13 valid and invalid)',
+        fn: () => {
+          const valid = window.CatalogCore.isValidBarcodeChecksum('8901030383700');
+          if (!valid) throw new Error('Expected 8901030383700 to have valid checksum');
+          const invalid = window.CatalogCore.isValidBarcodeChecksum('8901030383709');
+          if (invalid) throw new Error('Expected 8901030383709 to fail checksum');
+        }
+      },
+      {
+        name: 'RFC 4180 CSV Parsing with Quoted Fields and Commas',
+        fn: () => {
+          const csv = 'barcode,product_name\n"890123","Tata Salt, 1kg Iodised"\n"012345","Atta "Special""';
+          const parsed = window.CsvProvider.parseCSV(csv);
+          if (parsed.length !== 3) throw new Error(`Expected 3 rows, got ${parsed.length}`);
+          if (parsed[1][1] !== 'Tata Salt, 1kg Iodised') throw new Error(`Comma in quotes parsed incorrectly: ${parsed[1][1]}`);
+        }
+      },
+      {
+        name: 'Licence Engine: Classifies CC-BY-SA, CC0, and Unknown Licences',
+        fn: () => {
+          const ccby = window.LicensingEngine.inspectLicence('CC-BY-SA 4.0');
+          if (!ccby.shareAlike || !ccby.requiresAttribution) throw new Error('CC-BY-SA flags incorrect');
+          const unk = window.LicensingEngine.inspectLicence('SomeRandomLicense');
+          if (unk.canDownload) throw new Error('Unknown licence should not allow downloading');
+        }
+      },
+      {
+        name: 'Canonical Product Schema Enforcement & Primary Image Fallback',
+        fn: () => {
+          const prod = window.CatalogCore.createCanonicalProduct({
+            barcode: '8901030383700',
+            product_name: 'Tata Salt',
+            images: [
+              { image_url: 'https://example.com/1.jpg', is_primary: false }
+            ]
+          });
+          if (!prod.images[0].is_primary) throw new Error('Single image did not default to primary');
+          if (prod.currency !== 'INR') throw new Error('Default currency should be INR');
+        }
+      },
+      {
+        name: 'Deduplicate & Merge: Preserves Retailer Price from Overwrite',
+        fn: () => {
+          const existing = [{
+            product_id: 'p1',
+            barcode: '8901030383700',
+            product_name: 'Tata Salt',
+            selling_price: 27.00,
+            images: []
+          }];
+          const incoming = window.CatalogCore.createCanonicalProduct({
+            barcode: '8901030383700',
+            product_name: 'Tata Salt Updated',
+            selling_price: 35.00
+          });
+          const res = window.CatalogCore.deduplicateAndMerge(existing, incoming, {
+            preserveExistingPrices: true
+          });
+          if (res.product.selling_price !== 27.00) {
+            throw new Error(`Expected preserved price 27.00, got ${res.product.selling_price}`);
+          }
+        }
+      },
+      {
+        name: 'IndexedDB Product Storage & Barcode Query',
+        fn: async () => {
+          const testProd = window.CatalogCore.createCanonicalProduct({
+            product_id: 'test_id_999',
+            barcode: '999888777666',
+            product_name: 'Test Salt Item',
+            mrp: 50.0
+          });
+          await window.CatalogStorage.saveProduct(testProd);
+          const retrieved = await window.CatalogStorage.getProductByBarcode('999888777666');
+          if (!retrieved || retrieved.product_name !== 'Test Salt Item') {
+            throw new Error('Could not retrieve saved product from IndexedDB by barcode');
+          }
+          await window.CatalogStorage.deleteProduct('test_id_999');
+        }
+      },
+      {
+        name: 'Debounce Search Handler Callback Execution',
+        fn: async () => {
+          let callCount = 0;
+          const debounced = window.CatalogSearch.createDebouncedSearch(() => {
+            callCount++;
+          }, 50);
+
+          debounced();
+          debounced();
+          debounced();
+
+          await new Promise(r => setTimeout(r, 100));
+          if (callCount !== 1) throw new Error(`Expected 1 call after debounce, got ${callCount}`);
+        }
+      },
+      {
+        name: 'POS Adapter: Callback and Form Auto-Fill Integrity',
+        fn: () => {
+          const fakeForm = document.createElement('form');
+          fakeForm.innerHTML = `
+            <input name="barcode" id="barcode">
+            <input name="product_name" id="product_name">
+            <input name="selling_price" id="selling_price" value="25.00">
+          `;
+          const prod = window.CatalogCore.createCanonicalProduct({
+            barcode: '8901030383700',
+            product_name: 'Tata Salt',
+            selling_price: 30.00
+          });
+          window.ProductCatalogPicker.populateHostForm(fakeForm, prod);
+          if (fakeForm.querySelector('#barcode').value !== '8901030383700') {
+            throw new Error('Barcode failed to populate host form');
+          }
+          // Existing selling_price should not be clobbered
+          if (fakeForm.querySelector('#selling_price').value !== '25.00') {
+            throw new Error('POS adapter clobbered existing selling price');
+          }
+        }
+      },
+      {
+        name: 'Google Drive and Sheets Mock Provider Fallbacks',
+        fn: async () => {
+          const driveImages = await window.GoogleDriveProvider.searchImages('salt');
+          if (!Array.isArray(driveImages)) throw new Error('Drive mock did not return array');
+          const sheetsProduct = await window.GoogleSheetsProvider.getProductByBarcode('8901030383700');
+          if (!sheetsProduct || sheetsProduct.brand !== 'Tata') {
+            throw new Error('Sheets mock did not return Tata product');
+          }
+        }
+      }
+    ];
+
+    async function runAllTests() {
+      const resultsContainer = document.getElementById('testResults');
+      resultsContainer.innerHTML = '';
+      let passed = 0;
+      let failed = 0;
+
+      for (let i = 0; i < tests.length; i++) {
+        const test = tests[i];
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-lg border text-xs flex items-center justify-between bg-white';
+
+        try {
+          await test.fn();
+          passed++;
+          row.classList.add('border-emerald-200', 'bg-emerald-50/40');
+          row.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-700 font-bold">✓ PASS</span>
+              <span class="font-medium text-gray-800">${test.name}</span>
+            </div>
+            <span class="text-[11px] text-emerald-600 font-mono">ok</span>
+          `;
+        } catch (err) {
+          failed++;
+          row.classList.add('border-red-200', 'bg-red-50/40');
+          row.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-red-700 font-bold">✗ FAIL</span>
+              <span class="font-medium text-gray-800">${test.name}</span>
+            </div>
+            <span class="text-[11px] text-red-600 font-mono">${err.message}</span>
+          `;
+        }
+        resultsContainer.appendChild(row);
+      }
+
+      const summary = document.getElementById('testSummary');
+      const counter = document.getElementById('testCounter');
+      counter.textContent = `${passed} / ${tests.length} passed`;
+
+      if (failed === 0) {
+        summary.className = 'p-4 rounded-xl bg-emerald-100 text-emerald-900 flex items-center justify-between text-sm font-semibold';
+        summary.firstElementChild.textContent = `All ${passed} tests passed successfully!`;
+      } else {
+        summary.className = 'p-4 rounded-xl bg-red-100 text-red-900 flex items-center justify-between text-sm font-semibold';
+        summary.firstElementChild.textContent = `${failed} test(s) failed.`;
+      }
+    }
+
+    document.getElementById('runTestsBtn').addEventListener('click', runAllTests);
+    window.addEventListener('load', runAllTests);
+  </script>
+</body>
+</html>
